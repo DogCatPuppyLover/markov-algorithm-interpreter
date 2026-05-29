@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Markov Algorithm Codegolf</title>
+        <style>
+            body {
+                margin: 20px 5%;
+                font-family: sans-serif;
+            }
+            #rules {
+                width: 100%;
+                height: 200px;
+            }
+
+            #input {
+                width: 100%;
+                height: 50px;
+            }
+
+            #output {
+                width: 100%;
+                height: 200px;
+            }
+
+            textarea {
+                margin: 10px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="textareabox">
+            <label for="batch">Batch size:</label><input type="number" id="batch" value="10000">
+            <label for="wait">Time between batches (ms):</label><input type="number" id="wait" value="0">
+        </div>
+        <div class="textareabox">
+            <label for="rules">Source rules:</label><br>
+            <textarea id="rules">aa::b
+:a</textarea>
+        </div>
+
+        <label for="input">Input:</label><br>
+
+        <div class="textareabox">
+            <textarea id="input"></textarea>
+        </div>
+        
+        <div>
+            <button onclick="run()">Run</button> <button onclick="pause()">Pause</button> Status: <span id="status"></span>
+        </div>
+
+        <label for="output">Output:</label>
+
+        <div class="textareabox">
+            <textarea id="output"></textarea>
+        </div>
+
+        <script>
+            var rulesText, inputText, rulesLines, outputBox, batchSize, batchWait, outputText, loopContinue, matchFound, iteration, newOutputBox, matchedRule, rulesPad, statusBox, compiledBox, definitions;
+
+            var isPaused = false;
+
+            function batch() {
+                setTimeout(() => {
+                    var checks = 0;
+                    while (loopContinue && checks < batchSize) {
+                        matchFound = false;
+                        for (var i = 0; i < rules.length; i++) {
+                            if (rules[i][0] == "") {
+                                matchFound = true;
+                                matchedRule = i + 1;
+                                outputText = rules[i][1] + outputText;
+                                if (rules[i][2]) {
+                                    loopContinue = false;
+                                }
+                                break;
+                            } else {
+                                if (outputText.includes(rules[i][0])) {
+                                    matchFound = true;
+                                    matchedRule = i + 1;
+                                    outputText = outputText.replace(rules[i][0], rules[i][1]);
+                                    if (rules[i][2]) {
+                                        loopContinue = false;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (matchFound) {
+                            newOutputBox = newOutputBox + "[" + String(iteration).padStart(4, "0") + "|" + String(matchedRule).padStart(rulesPad, "0") + "] " + outputText + "\n";
+                            if (!loopContinue) {
+                                newOutputBox = newOutputBox + "TERMINATING RULE";
+                                statusBox.innerHTML = "terminating rule";
+                            }
+                        } else {
+                            loopContinue = false;
+                            newOutputBox = newOutputBox + "NO MATCHING RULE";
+                            statusBox.innerHTML = "no matching rule";
+                        }
+
+                        iteration++;
+                        checks++;
+                    }
+
+                    if (newOutputBox.length > 1000000) {
+                        newOutputBox = newOutputBox.slice(newOutputBox.length - 1000000);
+                    }
+
+                    outputBox.value = newOutputBox;
+
+                    outputBox.scrollTop = outputBox.scrollHeight;
+
+                    if (loopContinue && !isPaused) {
+                        batch();
+                    }
+                }, batchWait);
+            }
+
+            function run() {
+                rulesText = document.getElementById("rules").value;
+                inputText = document.getElementById("input").value;
+                rulesLines = rulesText.split("\n");
+                outputBox = document.getElementById("output");
+                statusBox = document.getElementById("status");
+                batchSize = document.getElementById("batch").value;
+                batchWait = document.getElementById("wait").value;
+
+                isPaused = false;
+                statusBox.innerHTML = "unpaused";
+
+                rules = [];
+
+                rulesLines.forEach(function (item, index) {
+                    if (item.includes("::")) {
+                        var rule = item.split("::");
+                        rules.push([rule[0], rule[1], true]);
+                    } else if (item.includes(":")) {
+                        var rule = item.split(":");
+                        rules.push([rule[0], rule[1], false]);
+                    }
+                });
+
+                rulesPad = Math.floor(Math.log10(rules.length) + 1)
+
+                outputBox.value = "";
+
+                outputText = inputText;
+                loopContinue = true;
+                matchFound = false;
+                iteration = 1;
+                newOutputBox = "";
+
+                batch();
+            }
+
+            function pause() {
+                if (isPaused) {
+                    isPaused = false
+                    statusBox.innerHTML = "unpaused"
+                    batch();
+                } else {
+                    isPaused = true
+                    statusBox.innerHTML = "paused"
+                }
+            }
+        </script>
+    </body>
+</html>
+
+
