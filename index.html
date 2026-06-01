@@ -45,7 +45,7 @@
             <label for="batch">Batch size:</label><input type="number" id="batch" value="10000">
             <label for="wait">Time between batches (ms):</label><input type="number" id="wait" value="0">
         </div>
-        <label for="rules">Rules:</label><br>
+        <label for="rules">Rules (<span id="rulesLength"></span>):</label><br>
         <div id="ruleBox">
             <textarea id="ruleNumbers" disabled></textarea>
             <textarea id="rules">aa::b
@@ -59,7 +59,7 @@
         </div>
         
         <div>
-            <button onclick="run()">Run</button> <button onclick="pause()">Pause</button> Rules: <span id="rulesLength"></span>
+            <button onclick="run()">Run</button> <button onclick="pause()">Pause</button>
         </div>
 
         <label for="output">Status: <span id="status"></span></label>
