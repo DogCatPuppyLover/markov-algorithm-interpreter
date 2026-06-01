@@ -7,9 +7,21 @@
                 margin: 20px 5%;
                 font-family: sans-serif;
             }
+
+            #ruleBox {
+                display: flex;
+                width: 100%
+            }
+
+            #ruleNumbers {
+                width: 25px;
+                height: 250px;
+                text-align: right;
+                overflow: hidden;
+            }
+
             #rules {
-                width: 100%;
-                height: 200px;
+                flex: 1;
             }
 
             #input {
@@ -24,6 +36,7 @@
 
             textarea {
                 margin: 10px 0;
+                resize: none;
             }
         </style>
     </head>
@@ -32,8 +45,9 @@
             <label for="batch">Batch size:</label><input type="number" id="batch" value="10000">
             <label for="wait">Time between batches (ms):</label><input type="number" id="wait" value="0">
         </div>
-        <div class="textareabox">
-            <label for="rules">Source rules:</label><br>
+        <label for="rules">Rules:</label><br>
+        <div id="ruleBox">
+            <textarea id="ruleNumbers" disabled></textarea>
             <textarea id="rules">aa::b
 :a</textarea>
         </div>
@@ -58,6 +72,24 @@
             var rulesText, inputText, rulesLines, outputBox, batchSize, batchWait, outputText, loopContinue, matchFound, iteration, newOutputBox, matchedRule, rulesPad, statusBox, compiledBox, definitions;
 
             var isPaused = false;
+
+            function number() {
+                rulesLines = document.getElementById("rules").value.split("\n");
+                ruleNumbers = "";
+                ruleCount = 0;
+
+                rulesLines.forEach(function (item, index) {
+                    if (item.includes(":")) {
+                        ruleCount++;
+                        ruleNumbers = ruleNumbers + ruleCount + "\n";
+                    } else {
+                        ruleNumbers = ruleNumbers + "\n";
+                    }
+                });
+
+                document.getElementById("ruleNumbers").value = ruleNumbers;
+                document.getElementById("rulesLength").innerHTML = ruleCount;
+            }
 
             function batch() {
                 setTimeout(() => {
@@ -145,7 +177,7 @@
 
                 outputBox.value = "";
 
-                rulesLength.innerHTML = rules.length;
+                number();
 
                 outputText = inputText;
                 loopContinue = true;
@@ -166,6 +198,17 @@
                     statusBox.innerHTML = "paused"
                 }
             }
+
+            number();
+
+            var rulesBox = document.getElementById("rules");
+            var ruleNumbersBox = document.getElementById("ruleNumbers");
+
+            rulesBox.addEventListener("input", number);
+
+            rulesBox.addEventListener("scroll", () => {
+                ruleNumbersBox.scrollTop = rulesBox.scrollTop;
+            });
         </script>
     </body>
 </html>
