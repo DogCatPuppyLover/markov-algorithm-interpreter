@@ -45,10 +45,10 @@
         </div>
         
         <div>
-            <button onclick="run()">Run</button> <button onclick="pause()">Pause</button> Status: <span id="status"></span>
+            <button onclick="run()">Run</button> <button onclick="pause()">Pause</button> Rules: <span id="rulesLength"></span>
         </div>
 
-        <label for="output">Output:</label>
+        <label for="output">Status: <span id="status"></span></label>
 
         <div class="textareabox">
             <textarea id="output"></textarea>
@@ -120,6 +120,7 @@
                 rulesText = document.getElementById("rules").value;
                 inputText = document.getElementById("input").value;
                 rulesLines = rulesText.split("\n");
+                rulesLength = document.getElementById("rulesLength");
                 outputBox = document.getElementById("output");
                 statusBox = document.getElementById("status");
                 batchSize = document.getElementById("batch").value;
@@ -143,6 +144,8 @@
                 rulesPad = Math.floor(Math.log10(rules.length) + 1)
 
                 outputBox.value = "";
+
+                rulesLength.innerHTML = rules.length;
 
                 outputText = inputText;
                 loopContinue = true;
